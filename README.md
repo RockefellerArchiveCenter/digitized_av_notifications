@@ -5,7 +5,24 @@ Handles notifications for validation and packaging of incoming digitized audiovi
 
 ## Getting Started
 
-To add.
+With [git](https://git-scm.com/) installed, pull down the source code and move into the newly created directory:
+
+```
+git clone https://github.com/RockefellerArchiveCenter/digitized_av_notifications.git
+cd digitized_av_notifications
+```
+
+With the [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html) installed, build the application:
+
+```
+sam build --hook-name terraform --beta-features aws_lambda_function.handle_digitized_av_notifications
+```
+
+Then, invoke the function using one of the fixtures:
+
+```
+sam local invoke --hook-name terraform --beta-features handle_digitized_av_notifications -e fixtures/failure_message.json
+```
 
 ## Usage
 
