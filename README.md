@@ -12,7 +12,7 @@ git clone https://github.com/RockefellerArchiveCenter/digitized_av_notifications
 cd digitized_av_notifications
 ```
 
-With the [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html) installed, build the application:
+With the [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html) and [Docker](https://www.docker.com/community-edition) installed, build the application:
 
 ```
 sam build --hook-name terraform --beta-features aws_lambda_function.handle_digitized_av_notifications
