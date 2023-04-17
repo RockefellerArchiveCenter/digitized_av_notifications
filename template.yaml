@@ -17,6 +17,9 @@ Parameters:
     Type: String
     Default: digitized-av-events
     Description: Name of SNS topic to trigger Lambda
+  LambdaRole:
+    Type: String
+    Description: IAM Role ARN for Lambda function
 
 Resources:
   DigitizedAvEvents:
@@ -31,6 +34,7 @@ Resources:
       Handler: handle_digitized_av_notifications.lambda_handler
       FunctionName: digitized_av_notifications
       Runtime: python3.9
+      Role: !Ref LambdaRole
       Architectures:
         - x86_64
       Environment:
@@ -47,6 +51,3 @@ Outputs:
   HelloWorldFunction:
     Description: "Handle Digitized AV Notifications Lambda Function ARN"
     Value: !GetAtt HandleDigitizedAvNotificationsFunction.Arn
-  HelloWorldFunctionIamRole:
-    Description: "Implicit IAM Role created for Hello World function"
-    Value: !GetAtt HandleDigitizedAvNotificationsFunctionRole.Arn

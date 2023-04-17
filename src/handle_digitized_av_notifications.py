@@ -3,7 +3,9 @@
 import json
 import logging
 import os
+from base64 import b64decode
 
+import boto3
 import urllib3
 
 http = urllib3.PoolManager()
@@ -50,11 +52,17 @@ def lambda_handler(event, context):
         logger.info("Failure message received.")
         title = event['Records'][0]['Sns']['Message']
         message, status, color_name = parse_failure_attributes(attributes)
+        encrypted_url = os.environ['TEAMS_URL']
+        decrypted_url = boto3.client('kms').decrypt(
+            CiphertextBlob=b64decode(encrypted_url),
+            EncryptionContext={
+                'LambdaFunctionName': os.environ['AWS_LAMBDA_FUNCTION_NAME']}
+        )['Plaintext'].decode('utf-8')
         send_teams_message(
             title,
             message,
             status,
             color_name,
-            os.environ.get('TEAMS_URL'))
+            decrypted_url)
     else:
         logger.info("No status worth notifying.")
