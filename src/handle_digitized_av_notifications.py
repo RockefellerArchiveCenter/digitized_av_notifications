@@ -14,16 +14,19 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 
-def parse_failure_attributes(attributes):
-    """Parses message attributes for failure messages."""
-    message = attributes['message']['Value']
-    color_name = '#ff0000'
-    status = attributes['outcome']['Value']
-    return message, status, color_name
+def parse_attributes(attributes):
+    """Parses attributes from messages."""
+    color_name = '#ff0000' if attributes['outcome']['Value'] == 'FAILURE' else '#008000'
+    format = attributes['format']['Value']
+    refid = attributes['refid']['Value']
+    service = attributes['service']['Value']
+    outcome = attributes['outcome']['Value'].lower()
+    message = attributes.get('message', {}).get('Value')
+    return color_name, format, refid, service, outcome, message
 
 
-def send_teams_message(title, message, status, color_name, url):
-    """Delivers message to Teams channel endpoint."""
+def structure_teams_message(color_name, title, message, facts):
+    """Structures Teams message using arguments."""
     notification = {
         "@type": "MessageCard",
         "@context": "http://schema.org/extensions",
@@ -32,37 +35,40 @@ def send_teams_message(title, message, status, color_name, url):
         "sections": [{
             "activityTitle": title,
             "text": message,
-            "facts": [{
-                    "name": "Status",
-                    "value": status
-            }]
+            "facts": [{"name": k, "value": v} for k, v in facts.items()]
         }]}
-    encoded_msg = json.dumps(notification).encode('utf-8')
-    response = http.request('POST', url, body=encoded_msg)
+    return json.dumps(notification).encode('utf-8')
+
+
+def send_teams_message(message, url):
+    """Delivers message to Teams channel endpoint."""
+    response = http.request('POST', url, body=message)
     logger.info('Status Code: {}'.format(response.status))
     logger.info('Response: {}'.format(response.data))
 
 
+def decrypt_environment_variable(key):
+    """Decrypts environment variables."""
+    encrypted = os.environ[key]
+    return boto3.client('kms').decrypt(
+        CiphertextBlob=b64decode(encrypted),
+        EncryptionContext={
+            'LambdaFunctionName': os.environ['AWS_LAMBDA_FUNCTION_NAME']}
+    )['Plaintext'].decode('utf-8')
+
+
 def lambda_handler(event, context):
     """Main handler for function."""
+    logger.info("Message received.")
 
+    title = event['Records'][0]['Sns']['Message']
     attributes = event['Records'][0]['Sns']['MessageAttributes']
-
-    if attributes['outcome']['Value'] == 'FAILURE':
-        logger.info("Failure message received.")
-        title = event['Records'][0]['Sns']['Message']
-        message, status, color_name = parse_failure_attributes(attributes)
-        encrypted_url = os.environ['TEAMS_URL']
-        decrypted_url = boto3.client('kms').decrypt(
-            CiphertextBlob=b64decode(encrypted_url),
-            EncryptionContext={
-                'LambdaFunctionName': os.environ['AWS_LAMBDA_FUNCTION_NAME']}
-        )['Plaintext'].decode('utf-8')
-        send_teams_message(
-            title,
-            message,
-            status,
-            color_name,
-            decrypted_url)
-    else:
-        logger.info("No status worth notifying.")
+    color_name, format, refid, service, outcome, message = parse_attributes(
+        attributes)
+    message = structure_teams_message(
+        color_name,
+        title,
+        message,
+        {'Service': service, 'Outcome': outcome, 'Format': format, 'RefID': refid})
+    decrypted_url = decrypt_environment_variable('TEAMS_URL')
+    send_teams_message(message, decrypted_url)
