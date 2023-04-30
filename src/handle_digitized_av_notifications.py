@@ -31,10 +31,10 @@ def structure_teams_message(color_name, title, message, facts):
         "@type": "MessageCard",
         "@context": "http://schema.org/extensions",
         "themeColor": color_name,
-        "summary": message,
+        "summary": message if message else 'Summary',
         "sections": [{
             "activityTitle": title,
-            "text": message,
+            "text": message if message else 'Summary',
             "facts": [{"name": k, "value": v} for k, v in facts.items()]
         }]}
     return json.dumps(notification).encode('utf-8')
