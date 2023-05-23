@@ -23,7 +23,7 @@ Parameters:
     Description: Name of Lambda function
 
 Resources:
-  HandleDigitizedAvNotificationsRole:
+  HandleDigitizedAVNotificationsRole:
     Type: AWS::IAM::Role
     Properties: 
       AssumeRolePolicyDocument:
@@ -56,18 +56,18 @@ Resources:
                   StringEquals:
                     'kms:EncryptionContext:LambdaFunctionName': !Ref LambdaName
       RoleName: !Sub '${LambdaName}_role'
-  DigitizedAvEventsTopic:
+  DigitizedAVEventsTopic:
       Type: AWS::SNS::Topic
       Properties:
         TopicName: !Ref SnsTopicName
-  HandleDigitizedAvNotificationsFunction:
+  HandleDigitizedAVNotificationsFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: ./src
       Handler: handle_digitized_av_notifications.lambda_handler
       FunctionName: !Ref LambdaName
       Runtime: python3.9
-      Role: !GetAtt HandleDigitizedAvNotificationsRole.Arn
+      Role: !GetAtt HandleDigitizedAVNotificationsRole.Arn
       Timeout: 10
       Architectures:
         - x86_64
@@ -76,15 +76,18 @@ Resources:
           TEAMS_URL:
             Ref: TeamsUrl
       Events:
-        DigitizedAvEventsTopic:
+        DigitizedAVEventsTopic:
           Type: SNS
           Properties:
-            Topic: !Ref DigitizedAvEventsTopic
+            Topic: !Ref DigitizedAVEventsTopic
 
 Outputs:
-  HandleDigitizedAvNotificationsFunction:
+  HandleDigitizedAVNotificationsFunction:
     Description: 'Handle Digitized AV Notifications Lambda Function ARN'
-    Value: !GetAtt HandleDigitizedAvNotificationsFunction.Arn
-  DigitizedAvEventsTopic:
+    Value: !GetAtt HandleDigitizedAVNotificationsFunction.Arn
+  DigitizedAVEventsTopic:
     Description: 'Digitized AV Events SNS Topic ARN'
-    Value: !GetAtt DigitizedAvEventsTopic.TopicArn
+    Value: !GetAtt DigitizedAVEventsTopic.TopicArn
+    Export:
+      Name:
+        DigitizedAV-SNSTopicArn
