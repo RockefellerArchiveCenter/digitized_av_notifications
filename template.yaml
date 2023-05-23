@@ -36,19 +36,13 @@ Resources:
             Action:
               - 'sts:AssumeRole'
       Description: !Sub 'Allows ${LambdaName} lambda to be executed successfully.'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
       Policies: 
-        - PolicyName: ExecutionPolicy
+        - PolicyName: KMSDecryptPolicy
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
-              - Effect: Allow
-                Action: 'logs:CreateLogGroup'
-                Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*'
-              - Effect: Allow
-                Action: 
-                  - 'logs:CreateLogStream'
-                  - 'logs:PutLogEvents'
-                Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${LambdaName}:*'
               - Effect: Allow
                 Action: 'kms:Decrypt'
                 Resource: !Sub 'arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/5be10a8b-c0cb-4d4a-89f1-3577380a2d8b'
