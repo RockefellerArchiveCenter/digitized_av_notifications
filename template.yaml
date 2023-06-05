@@ -10,13 +10,17 @@ Globals:
     Timeout: 3
 
 Parameters:
-  TeamsUrl:
+  ApplicationEnvironment:
     Type: String
-    Description: The encrypted URL of an incoming webhook for a Teams channel to which notifications should be posted.
-  SnsTopicName:
+    Description: The environment in which the application should be deployed.
+    AllowedValues:
+      - dev
+      - prod
+    Default: dev
+  ApplicationName:
     Type: String
-    Default: digitized-av-events
-    Description: Name of SNS topic to trigger Lambda
+    Description: The name of the application to be deployed.
+    Default: digitized-av-notifications
   LambdaName:
     Type: String
     Default: digitized_av_notifications
@@ -50,10 +54,12 @@ Resources:
                   StringEquals:
                     'kms:EncryptionContext:LambdaFunctionName': !Ref LambdaName
       RoleName: !Sub '${LambdaName}_role'
+  
   DigitizedAVEventsTopic:
       Type: AWS::SNS::Topic
       Properties:
-        TopicName: !Ref SnsTopicName
+        TopicName: digitized-av-events
+  
   HandleDigitizedAVNotificationsFunction:
     Type: AWS::Serverless::Function
     Properties:

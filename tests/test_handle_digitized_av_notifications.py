@@ -9,9 +9,9 @@ from src.handle_digitized_av_notifications import (lambda_handler,
 
 
 @patch('src.handle_digitized_av_notifications.structure_teams_message')
-@patch('src.handle_digitized_av_notifications.decrypt_environment_variable')
+@patch('src.handle_digitized_av_notifications.get_config')
 @patch('src.handle_digitized_av_notifications.send_teams_message')
-def test_success_notification(mock_send, mock_decrypt, mock_structure):
+def test_success_notification(mock_send, mock_config, mock_structure):
     with open(Path('tests', 'fixtures', 'success_message.json'), 'r') as jf:
         message = json.load(jf)
         lambda_handler(message, None)
@@ -22,14 +22,14 @@ def test_success_notification(mock_send, mock_decrypt, mock_structure):
             {'Service': 'validation', 'Outcome': 'success', 'Format': 'video',
                 'RefID': '20f8da26e268418ead4aa2365f816a08'}
         )
-        mock_decrypt.assert_called_once()
+        mock_config.assert_called_once()
         mock_send.assert_called_once()
 
 
 @patch('src.handle_digitized_av_notifications.structure_teams_message')
-@patch('src.handle_digitized_av_notifications.decrypt_environment_variable')
+@patch('src.handle_digitized_av_notifications.get_config')
 @patch('src.handle_digitized_av_notifications.send_teams_message')
-def test_failure_notification(mock_send, mock_decrypt, mock_structure):
+def test_failure_notification(mock_send, mock_config, mock_structure):
     with open(Path('tests', 'fixtures', 'failure_message.json'), 'r') as jf:
         message = json.load(jf)
         lambda_handler(message, None)
@@ -40,7 +40,7 @@ def test_failure_notification(mock_send, mock_decrypt, mock_structure):
             {'Service': 'validation', 'Outcome': 'failure', 'Format': 'video',
                 'RefID': '20f8da26e268418ead4aa2365f816a08'}
         )
-        mock_decrypt.assert_called_once()
+        mock_config.assert_called_once()
         mock_send.assert_called_once()
 
 
