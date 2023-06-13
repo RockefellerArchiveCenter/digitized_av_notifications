@@ -25,6 +25,9 @@ Parameters:
     Type: String
     Default: digitized_av_notifications
     Description: Name of Lambda function
+  TeamsUrl:
+    Type: String
+    Description: URL for a Teams channel webhook.
 
 Resources:
   HandleDigitizedAVNotificationsRole:
@@ -57,6 +60,18 @@ Resources:
       Type: AWS::SNS::Topic
       Properties:
         TopicName: digitized-av-events
+
+  TeamsUrlParameter:
+    Type: AWS::SSM::Parameter
+    Properties: 
+      AllowedPattern: "^https:\/\/.$"
+      Description: URL for Teams Channel webhook.
+      Name: !Sub /${ApplicationEnvironment}/${ApplicationName}/TEAMS_URL
+      Tags: 
+        Environment: !Ref ApplicationEnvironment
+        Application: !Ref ApplicationName
+      Type: String
+      Value: !Ref TeamsUrl
   
   HandleDigitizedAVNotificationsFunction:
     Type: AWS::Serverless::Function
