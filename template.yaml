@@ -64,7 +64,6 @@ Resources:
   TeamsUrlParameter:
     Type: AWS::SSM::Parameter
     Properties: 
-      AllowedPattern: "^https:\/\/.$"
       Description: URL for Teams Channel webhook.
       Name: !Sub /${ApplicationEnvironment}/${ApplicationName}/TEAMS_URL
       Tags: 
