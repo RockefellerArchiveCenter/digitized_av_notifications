@@ -42,17 +42,15 @@ Resources:
       Description: !Sub 'Allows ${LambdaName} lambda to be executed successfully.'
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-      Policies: 
-        - PolicyName: KMSDecryptPolicy
+      Policies:
+        - PolicyName: DigitizedAVParameterStorePolicy
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
               - Effect: Allow
-                Action: 'kms:Decrypt'
-                Resource: !Sub 'arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/5be10a8b-c0cb-4d4a-89f1-3577380a2d8b'
-                Condition:
-                  StringEquals:
-                    'kms:EncryptionContext:LambdaFunctionName': !Ref LambdaName
+                Action: 
+                  - 'ssm:GetParametersByPath*'
+                Resource: !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${ApplicationEnvironment}/${ApplicationName}*'
       RoleName: !Sub '${LambdaName}_role'
   
   DigitizedAVEventsTopic:
@@ -73,8 +71,10 @@ Resources:
         - x86_64
       Environment:
         Variables:
-          TEAMS_URL:
-            Ref: TeamsUrl
+          ENV:
+            Ref: ApplicationEnvironment
+          APP_CONFIG_PATH:
+            Ref: ApplicationName
       Events:
         DigitizedAVEventsTopic:
           Type: SNS
