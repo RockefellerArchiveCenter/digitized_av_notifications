@@ -54,7 +54,6 @@ Resources:
                 Action: 
                   - 'ssm:GetParametersByPath*'
                 Resource: !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${ApplicationEnvironment}/${ApplicationName}*'
-      RoleName: !Sub '${LambdaName}_role'
   
   DigitizedAVEventsTopic:
       Type: AWS::SNS::Topic
