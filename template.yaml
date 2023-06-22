@@ -16,14 +16,11 @@ Parameters:
     AllowedValues:
       - dev
       - prod
-    Default: dev
   ApplicationName:
     Type: String
     Description: The name of the application to be deployed.
-    Default: digitized-av-notifications
   LambdaName:
     Type: String
-    Default: digitized_av_notifications
     Description: Name of Lambda function
   TeamsUrl:
     Type: String
