@@ -1,13 +1,8 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Transform: AWS::Serverless-2016-10-31
 Description: >
   digitized-av-notifications
 
   Handles notifications for validation and packaging of incoming digitized audiovisual assets.
-
-Globals:
-  Function:
-    Timeout: 3
 
 Parameters:
   ApplicationEnvironment:
@@ -19,9 +14,6 @@ Parameters:
   ApplicationName:
     Type: String
     Description: The name of the application to be deployed.
-  LambdaName:
-    Type: String
-    Description: Name of Lambda function
   TeamsUrl:
     Type: String
     Description: URL for a Teams channel webhook.
@@ -39,7 +31,7 @@ Resources:
                 - lambda.amazonaws.com
             Action:
               - 'sts:AssumeRole'
-      Description: !Sub 'Allows ${LambdaName} lambda to be executed successfully.'
+      Description: !Sub 'Allows ${ApplicationName} lambda to be executed successfully.'
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
       Policies:
@@ -67,29 +59,44 @@ Resources:
         Application: !Ref ApplicationName
       Type: String
       Value: !Ref TeamsUrl
-  
+
   HandleDigitizedAVNotificationsFunction:
-    Type: AWS::Serverless::Function
+    Type: AWS::Lambda::Function
     Properties:
-      CodeUri: ./src
+      Code:
+        S3Bucket: !Sub 'rac-${ApplicationEnvironment}-lambda'
+        S3Key: !Sub '${ApplicationName}.zip'
+      FunctionName: !Ref ApplicationName
       Handler: handle_digitized_av_notifications.lambda_handler
-      FunctionName: !Ref LambdaName
-      Runtime: python3.9
       Role: !GetAtt HandleDigitizedAVNotificationsRole.Arn
+      Runtime: python3.9
       Timeout: 10
-      Architectures:
-        - x86_64
       Environment:
         Variables:
-          ENV:
-            Ref: ApplicationEnvironment
-          APP_CONFIG_PATH:
-            Ref: ApplicationName
-      Events:
-        DigitizedAVEventsTopic:
-          Type: SNS
-          Properties:
-            Topic: !Ref DigitizedAVEventsTopic
+          ENV: !Ref ApplicationEnvironment
+          APP_CONFIG_PATH: !Ref ApplicationName
+      Tags:
+        - Key: Environment
+          Value: !Ref ApplicationEnvironment
+        - Key: Application
+          Value: !Ref ApplicationName
+      Architectures:
+        - x86_64
+  
+  HandleDigitizedAVNotificationsFunctionDigitizedAvEventsPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref HandleDigitizedAVNotificationsFunction
+      Principal: sns.amazonaws.com
+      SourceArn: !Ref DigitizedAVEventsTopic
+  
+  HandleDigitizedAVNotificationsFunctionDigitizedAvEvents:
+    Type: AWS::SNS::Subscription
+    Properties:
+      Endpoint: !GetAtt HandleDigitizedAVNotificationsFunction.Arn
+      Protocol: lambda
+      TopicArn: !Ref DigitizedAVEventsTopic
 
 Outputs:
   HandleDigitizedAVNotificationsFunction:
@@ -97,7 +104,7 @@ Outputs:
     Value: !GetAtt HandleDigitizedAVNotificationsFunction.Arn
   DigitizedAVEventsTopic:
     Description: 'Digitized AV Events SNS Topic ARN'
-    Value: !GetAtt DigitizedAVEventsTopic.TopicArn
+    Value: !Ref DigitizedAVEventsTopic
     Export:
       Name:
         DigitizedAV-SNSTopicArn
