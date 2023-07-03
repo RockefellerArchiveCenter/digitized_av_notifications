@@ -18,32 +18,18 @@ before_deploy:
   - sudo deploy_scripts/make_zip_lambda.sh ${LAMBDA_NAME} src/handle_digitized_av_notifications.py
 
 deploy:
-  - provider: s3
-    bucket: rac-dev-cloudformation-apps
-    access_key_id: $AWS_ACCESS_KEY_ID
-    secret_access_key: $AWS_SECRET_ACCESS_KEY
-    glob: ${LAMBDA_NAME}.template
+  - provider: script
+    script: >-
+      bash deploy_scripts/upload_file_to_s3.sh ${LAMBDA_NAME}.template rac-dev-cloudformation-apps &&
+      bash deploy_scripts/upload_file_to_s3.sh ${LAMBDA_NAME}.zip rac-dev-lambda &&
+      bash deploy_scripts/deploy_package_lambda.sh ${LAMBDA_NAME}
     on:
       branch: development
-  - provider: s3
-    bucket: rac-prod-cloudformation-apps
-    access_key_id: $AWS_ACCESS_KEY_ID
-    secret_access_key: $AWS_SECRET_ACCESS_KEY
-    glob: ${LAMBDA_NAME}.template
-    on:
-      branch: base
-  - provider: s3
-    bucket: rac-dev-lambda
-    access_key_id: $AWS_ACCESS_KEY_ID
-    secret_access_key: $AWS_SECRET_ACCESS_KEY
-    glob: ${LAMBDA_NAME}.zip
-    on:
-      branch: development
-  - provider: s3
-    bucket: rac-prod-lambda
-    access_key_id: $AWS_ACCESS_KEY_ID
-    secret_access_key: $AWS_SECRET_ACCESS_KEY
-    glob: ${LAMBDA_NAME}.zip
+  - provider: script
+    script: >-
+      bash deploy_scripts/upload_file_to_s3.sh ${LAMBDA_NAME}.template rac-prod-cloudformation-apps &&
+      bash deploy_scripts/upload_file_to_s3.sh ${LAMBDA_NAME}.zip rac-prod-lambda &&
+      bash deploy_scripts/deploy_package_lambda.sh ${LAMBDA_NAME}
     on:
       branch: base
   - provider: script
