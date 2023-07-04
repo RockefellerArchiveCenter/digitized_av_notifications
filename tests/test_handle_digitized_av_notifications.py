@@ -4,7 +4,10 @@ import json
 from pathlib import Path
 from unittest.mock import patch
 
-from src.handle_digitized_av_notifications import (lambda_handler,
+import boto3
+from moto import mock_ssm
+
+from src.handle_digitized_av_notifications import (get_config, lambda_handler,
                                                    structure_teams_message)
 
 
@@ -54,3 +57,17 @@ def test_structure_teams_message():
             expected = json.load(df)
             output = structure_teams_message(*args)
             assert output == json.dumps(expected).encode('utf-8')
+
+
+@mock_ssm
+def test_config():
+    ssm = boto3.client('ssm', region_name='us-east-1')
+    path = "/dev/digitized_av_trigger"
+    for name, value in [("foo", "bar"), ("baz", "buzz")]:
+        ssm.put_parameter(
+            Name=f"{path}/{name}",
+            Value=value,
+            Type="SecureString",
+        )
+    config = get_config(path)
+    assert config == {'foo': 'bar', 'baz': 'buzz'}
