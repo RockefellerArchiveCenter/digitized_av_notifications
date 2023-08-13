@@ -13,9 +13,7 @@ http = urllib3.PoolManager()
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-ssm_client = boto3.client(
-    'ssm', region_name=environ.get(
-        'AWS_DEFAULT_REGION', 'us-east-1'))
+
 full_config_path = f"/{environ.get('ENV')}/{environ.get('APP_CONFIG_PATH')}"
 
 
@@ -63,6 +61,10 @@ def get_config(ssm_parameter_path):
     """
     configuration = {}
     try:
+        ssm_client = boto3.client(
+            'ssm', region_name=environ.get(
+                'AWS_DEFAULT_REGION', 'us-east-1'))
+
         param_details = ssm_client.get_parameters_by_path(
             Path=ssm_parameter_path,
             Recursive=False,
