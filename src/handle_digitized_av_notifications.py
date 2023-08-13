@@ -91,10 +91,10 @@ def lambda_handler(event, context):
     attributes = event['Records'][0]['Sns']['MessageAttributes']
     color_name, format, refid, service, outcome, message = parse_attributes(
         attributes)
-    message = structure_teams_message(
+    structured_message = structure_teams_message(
         color_name,
         title,
         message,
         {'Service': service, 'Outcome': outcome, 'Format': format, 'RefID': refid})
     decrypted_url = config.get('TEAMS_URL')
-    send_teams_message(message, decrypted_url)
+    send_teams_message(structured_message, decrypted_url)
