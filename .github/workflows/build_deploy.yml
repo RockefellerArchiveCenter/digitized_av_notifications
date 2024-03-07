@@ -50,7 +50,7 @@ jobs:
     env:
       LAMBDA_NAME: digitized_av_notifications
       LAMBDA_HANDLER_CODE: src/handle_digitized_av_notifications.py
-      BASENAME: $(basename src/handle_digitized_av_notifications.py)
+      BASENAME: handle_digitized_av_notifications.py
 
     steps:
       - name: Clone deploy scripts if not present
@@ -59,21 +59,16 @@ jobs:
             git clone https://github.com/RockefellerArchiveCenter/deploy_scripts.git;
           fi
 
-      - name: Echo env variables
+      - name: Make zip file
         run: |
-          echo "${{ env.LAMBDA_HANDLER_CODE }}"
-          echo "${{ env.BASENAME }}"
-          echo "${{ env.LAMBDA_NAME }}"
-      #- name: Make zip file
-        #run: |
-          #cp ${{ env.LAMBDA_HANDLER_CODE }} ${{ env.BASENAME }}
-          #zip ${{ env.LAMBDA_NAME }}.zip ${{ env.BASENAME }}
+          cp ${{ env.LAMBDA_HANDLER_CODE }} ${{ env.BASENAME }}
+          zip ${{ env.LAMBDA_NAME }}.zip ${{ env.BASENAME }}
 
-      #- name: Substitute environment variables
-        #uses: tvarohohlavy/inplace-envsubst-action@v1.0.0
-        #with:
-          #files: |
-            #deploy_scripts/make_zip_lambda.sh
+      - name: Substitute environment variables
+        uses: tvarohohlavy/inplace-envsubst-action@v1.0.0
+        with:
+          files: |
+            deploy_scripts/make_zip_lambda.sh
 
       #- name: Configure AWS Credentials
         #uses: aws-actions/configure-aws-credentials@v4.0.2
