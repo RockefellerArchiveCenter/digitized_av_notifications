@@ -39,22 +39,29 @@ jobs:
       - name: Run tests
         run: tox
 
-  #deploy:
-    #if: github.ref != 'refs/heads/base' || github.ref != 'refs/heads/development'
-    #runs-on: ubuntu-latest
+  deploy:
+    if: github.ref != 'refs/heads/base' || github.ref != 'refs/heads/development'
+    runs-on: ubuntu-latest
 
-    #environment:
-      #name: ${{ github.ref_name }}
+    environment:
+      name: ${{ github.ref_name }}
 
-    #env:
-      #LAMBDA_NAME: digitized_av_notifications
+    env:
+      LAMBDA_NAME: digitized_av_notifications
+      LAMBDA_HANDLER_CODE: src/handle_digitized_av_notifications.py
+      BASENAME: $(basename ${LAMBDA_HANDLER_CODE})
 
-    #steps:
-      #- name: Clone deploy scripts if not present
-        #run: |
-          #if [ ! -d deploy_scripts ]; then
-            #git clone https://github.com/RockefellerArchiveCenter/deploy_scripts.git;
-          #fi
+    steps:
+      - name: Clone deploy scripts if not present
+        run: |
+          if [ ! -d deploy_scripts ]; then
+            git clone https://github.com/RockefellerArchiveCenter/deploy_scripts.git;
+          fi
+
+      - name: Make zip file
+        run: |
+          cp ${LAMBDA_HANDLER_CODE} ${BASENAME}
+          zip ${LAMBDA_NAME}.zip ${BASENAME}
 
       #- name: Substitute environment variables
         #uses: tvarohohlavy/inplace-envsubst-action@v1.0.0
