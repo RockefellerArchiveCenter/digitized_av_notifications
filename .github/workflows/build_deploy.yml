@@ -44,7 +44,7 @@ jobs:
     #if: github.ref != 'refs/heads/base' || github.ref != 'refs/heads/development'
     runs-on: ubuntu-latest
 
-    #environment: development
+    environment: development
 
     env:
       LAMBDA_NAME: digitized_av_notifications
