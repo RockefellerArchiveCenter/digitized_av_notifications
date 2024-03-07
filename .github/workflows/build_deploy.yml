@@ -40,6 +40,7 @@ jobs:
         run: tox
 
   deploy:
+    needs: build
     if: github.ref != 'refs/heads/base' || github.ref != 'refs/heads/development'
     runs-on: ubuntu-latest
 
@@ -60,8 +61,8 @@ jobs:
 
       - name: Make zip file
         run: |
-          cp ${LAMBDA_HANDLER_CODE} ${BASENAME}
-          zip ${LAMBDA_NAME}.zip ${BASENAME}
+          cp ${env.LAMBDA_HANDLER_CODE} ${env.BASENAME}
+          zip ${env.LAMBDA_NAME}.zip ${env.BASENAME}
 
       #- name: Substitute environment variables
         #uses: tvarohohlavy/inplace-envsubst-action@v1.0.0
