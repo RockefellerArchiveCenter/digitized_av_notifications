@@ -49,10 +49,13 @@ jobs:
 
     env:
       LAMBDA_NAME: digitized_av_notifications
-      LAMBDA_HANDLER_CODE: /src/handle_digitized_av_notifications.py
+      LAMBDA_HANDLER_CODE: src/handle_digitized_av_notifications.py
       BASENAME: handle_digitized_av_notifications.py
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Clone deploy scripts if not present
         run: |
           if [ ! -d deploy_scripts ]; then
