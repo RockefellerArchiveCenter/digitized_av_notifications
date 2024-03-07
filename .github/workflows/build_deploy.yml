@@ -6,6 +6,10 @@ on:
       - development
       - base
 
+  pull_request:
+    branches:
+      - development
+
 jobs:
   build:
     if: github.ref != 'refs/heads/base' || github.ref != 'refs/heads/development'
