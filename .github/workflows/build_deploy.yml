@@ -50,7 +50,7 @@ jobs:
     env:
       LAMBDA_NAME: digitized_av_notifications
       LAMBDA_HANDLER_CODE: src/handle_digitized_av_notifications.py
-      BASENAME: $(basename ${{ env.LAMBDA_HANDLER_CODE }})
+      BASENAME: $(basename src/handle_digitized_av_notifications.py)
 
     steps:
       - name: Clone deploy scripts if not present
