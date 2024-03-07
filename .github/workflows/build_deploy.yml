@@ -84,14 +84,18 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
           aws-region: us-east-1
 
-      - name: Upload files to S3
+      - name: Upload file to S3
         run: aws s3 cp $LAMBDA_NAME.zip s3://$LAMBDA_BUCKET_NAME/$LAMBDA_NAME.zip
+
+      - name: Deploy lambda package
+        run: aws lambda update-function-code
+          --function-name arn:aws:lambda:us-east-1:$AWS_LAMBDA_ACCOUNT_ID:function:$LAMBDA_NAME
+          --zip-file fileb://$LAMBDA_NAME.zip
 
       #Replace these with actual AWS commands. Separate them out
       #- name: Deploy to Development
         #if: github.ref == 'refs/heads/development'
         #run: |
-          #bash deploy_scripts/upload_file_to_s3.sh ${LAMBDA_NAME}.template ${CLOUDFORMATION_BUCKET_NAME} &&
           #bash deploy_scripts/upload_file_to_s3.sh ${LAMBDA_NAME}.zip ${LAMBDA_BUCKET_NAME} &&
           #bash deploy_scripts/deploy_package_lambda.sh ${LAMBDA_NAME}
 
