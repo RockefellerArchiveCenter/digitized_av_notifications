@@ -85,9 +85,7 @@ jobs:
           aws-region: us-east-1
 
       - name: Upload files to S3
-        run: |
-          aws s3 cp $LAMBDA_NAME.template s3://$CLOUDFORMATION_BUCKET_NAME/$LAMBDA_NAME
-          aws s3 cp $LAMBDA_NAME.zip s3://$LAMBDA_BUCKET_NAME/$LAMBDA_NAME
+        run: aws s3 cp $LAMBDA_NAME.zip s3://$LAMBDA_BUCKET_NAME/$LAMBDA_NAME.zip
 
       #Replace these with actual AWS commands. Separate them out
       #- name: Deploy to Development
