@@ -49,23 +49,20 @@ jobs:
 
     env:
       LAMBDA_NAME: digitized_av_notifications
-      LAMBDA_HANDLER_CODE: src/handle_digitized_av_notifications.py
+      LAMBDA_HANDLER_CODE: /src/handle_digitized_av_notifications.py
       BASENAME: handle_digitized_av_notifications.py
 
     steps:
-      #- name: Clone deploy scripts if not present
-        #run: |
-          #if [ ! -d deploy_scripts ]; then
-            #git clone https://github.com/RockefellerArchiveCenter/deploy_scripts.git;
-          #fi
+      - name: Clone deploy scripts if not present
+        run: |
+          if [ ! -d deploy_scripts ]; then
+            git clone https://github.com/RockefellerArchiveCenter/deploy_scripts.git;
+          fi
 
-      - name: Print working directory contents
-        run: ls
-
-      #- name: Make zip file
-        #run: |
-          #cp ${{ env.LAMBDA_HANDLER_CODE }} ${{ env.BASENAME }}
-          #zip ${{ env.LAMBDA_NAME }}.zip ${{ env.BASENAME }}
+      - name: Make zip file
+        run: |
+          cp ${{ env.LAMBDA_HANDLER_CODE }} ${{ env.BASENAME }}
+          zip ${{ env.LAMBDA_NAME }}.zip ${{ env.BASENAME }}
 
       - name: Substitute environment variables
         uses: tvarohohlavy/inplace-envsubst-action@v1.0.0
