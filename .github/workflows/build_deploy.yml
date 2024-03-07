@@ -59,10 +59,13 @@ jobs:
             git clone https://github.com/RockefellerArchiveCenter/deploy_scripts.git;
           fi
 
-      - name: Make zip file
-        run: |
-          cp ${{ env.LAMBDA_HANDLER_CODE }} ${{ env.BASENAME }}
-          zip ${{ env.LAMBDA_NAME }}.zip ${{ env.BASENAME }}
+      - name: Print working directory
+        run: echo ${{ github.workspace }}
+
+      #- name: Make zip file
+        #run: |
+          #cp ${{ env.LAMBDA_HANDLER_CODE }} ${{ env.BASENAME }}
+          #zip ${{ env.LAMBDA_NAME }}.zip ${{ env.BASENAME }}
 
       - name: Substitute environment variables
         uses: tvarohohlavy/inplace-envsubst-action@v1.0.0
