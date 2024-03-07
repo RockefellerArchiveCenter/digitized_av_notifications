@@ -41,10 +41,10 @@ jobs:
 
   deploy:
     needs: build
-    if: github.ref != 'refs/heads/base' || github.ref != 'refs/heads/development'
+    #if: github.ref != 'refs/heads/base' || github.ref != 'refs/heads/development'
     runs-on: ubuntu-latest
 
-    environment: development
+    #environment: development
 
     env:
       LAMBDA_NAME: digitized_av_notifications
@@ -60,6 +60,12 @@ jobs:
         with:
           secrets: ${{ toJSON(secrets) }}
 
+      - name: Substitute environment variables
+        uses: tvarohohlavy/inplace-envsubst-action@v1.0.0
+        with:
+          files: |
+            deploy_scripts/deploy_package_lambda.sh
+
       - name: Clone deploy scripts if not present
         run: |
           if [ ! -d deploy_scripts ]; then
@@ -70,12 +76,6 @@ jobs:
         run: |
           cp ${{ env.LAMBDA_HANDLER_CODE }} ${{ env.BASENAME }}
           zip ${{ env.LAMBDA_NAME }}.zip ${{ env.BASENAME }}
-
-      - name: Substitute environment variables
-        uses: tvarohohlavy/inplace-envsubst-action@v1.0.0
-        with:
-          files: |
-            deploy_scripts/deploy_package_lambda.sh
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4.0.2
