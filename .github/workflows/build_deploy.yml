@@ -41,10 +41,11 @@ jobs:
 
   deploy:
     needs: build
-    #if: github.ref != 'refs/heads/base' || github.ref != 'refs/heads/development'
+    if: github.ref == 'refs/heads/base' || github.ref == 'refs/heads/development'
     runs-on: ubuntu-latest
 
-    environment: development
+    environment:
+      name: ${{ github.ref_name }}
 
     env:
       LAMBDA_NAME: digitized_av_notifications
@@ -66,12 +67,6 @@ jobs:
         with:
           secrets: ${{ toJSON(secrets) }}
 
-      - name: Substitute environment variables
-        uses: tvarohohlavy/inplace-envsubst-action@v1.0.0
-        with:
-          files: |
-            deploy_scripts/deploy_package_lambda.sh
-
       - name: Make zip file
         run: |
           cp ${{ env.LAMBDA_HANDLER_CODE }} ${{ env.BASENAME }}
@@ -91,17 +86,3 @@ jobs:
         run: aws lambda update-function-code
           --function-name arn:aws:lambda:us-east-1:$AWS_LAMBDA_ACCOUNT_ID:function:$LAMBDA_NAME
           --zip-file fileb://$LAMBDA_NAME.zip
-
-      #Replace these with actual AWS commands. Separate them out
-      #- name: Deploy to Development
-        #if: github.ref == 'refs/heads/development'
-        #run: |
-          #bash deploy_scripts/upload_file_to_s3.sh ${LAMBDA_NAME}.zip ${LAMBDA_BUCKET_NAME} &&
-          #bash deploy_scripts/deploy_package_lambda.sh ${LAMBDA_NAME}
-
-      #- name: Deploy to Base
-        #if: github.ref == 'refs/heads/base'
-        #run: |
-          #bash deploy_scripts/upload_file_to_s3.sh ${LAMBDA_NAME}.template rac-prod-cloudformation-apps &&
-          #bash deploy_scripts/upload_file_to_s3.sh ${LAMBDA_NAME}.zip rac-prod-lambda &&
-          #bash deploy_scripts/deploy_package_lambda.sh ${LAMBDA_NAME}
