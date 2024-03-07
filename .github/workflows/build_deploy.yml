@@ -53,11 +53,11 @@ jobs:
       BASENAME: handle_digitized_av_notifications.py
 
     steps:
-      - name: Clone deploy scripts if not present
-        run: |
-          if [ ! -d deploy_scripts ]; then
-            git clone https://github.com/RockefellerArchiveCenter/deploy_scripts.git;
-          fi
+      #- name: Clone deploy scripts if not present
+        #run: |
+          #if [ ! -d deploy_scripts ]; then
+            #git clone https://github.com/RockefellerArchiveCenter/deploy_scripts.git;
+          #fi
 
       - name: Print working directory contents
         run: ls
