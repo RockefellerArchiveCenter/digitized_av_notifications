@@ -59,8 +59,8 @@ jobs:
             git clone https://github.com/RockefellerArchiveCenter/deploy_scripts.git;
           fi
 
-      - name: Print working directory
-        run: echo ${{ github.workspace }}
+      - name: Print working directory contents
+        run: ls
 
       #- name: Make zip file
         #run: |
