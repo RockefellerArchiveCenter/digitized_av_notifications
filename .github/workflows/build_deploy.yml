@@ -45,7 +45,7 @@ jobs:
     runs-on: ubuntu-latest
 
     environment:
-      name: ${{ github.ref_name }}
+      name: development
 
     env:
       LAMBDA_NAME: digitized_av_notifications
@@ -55,6 +55,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Export secrets to environment variables
+        uses: oNaiPs/secrets-to-env-action@v1.5
+        with:
+          secrets: ${{ toJSON(secrets) }}
 
       - name: Clone deploy scripts if not present
         run: |
@@ -71,25 +76,26 @@ jobs:
         uses: tvarohohlavy/inplace-envsubst-action@v1.0.0
         with:
           files: |
-            deploy_scripts/make_zip_lambda.sh
+            deploy_scripts/deploy_package_lambda.sh
 
-      #- name: Configure AWS Credentials
-        #uses: aws-actions/configure-aws-credentials@v4.0.2
-        #with:
-          #aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
-          #aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
-          #aws-region: us-east-1
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4.0.2
+        with:
+          aws-access-key-id: $AWS_ACCESS_KEY
+          aws-secret-access-key: $AWS_SECRET_KEY
+          aws-region: us-east-1
 
-      #- name: Create Lambda ZIP package
-        #run: |
-          #sudo deploy_scripts/make_zip_lambda.sh $LAMBDA_NAME src/handle_digitized_av_notifications.py
+      - name: Upload files to S3
+        run: |
+          aws s3 cp $LAMBDA_NAME.template s3://$CLOUDFORMATION_BUCKET_NAME/$LAMBDA_NAME
+          aws s3 cp $LAMBDA_NAME.zip s3://$LAMBDA_BUCKET_NAME/$LAMBDA_NAME
 
       #Replace these with actual AWS commands. Separate them out
       #- name: Deploy to Development
         #if: github.ref == 'refs/heads/development'
         #run: |
-          #bash deploy_scripts/upload_file_to_s3.sh ${LAMBDA_NAME}.template rac-dev-cloudformation-apps &&
-          #bash deploy_scripts/upload_file_to_s3.sh ${LAMBDA_NAME}.zip rac-dev-lambda &&
+          #bash deploy_scripts/upload_file_to_s3.sh ${LAMBDA_NAME}.template ${CLOUDFORMATION_BUCKET_NAME} &&
+          #bash deploy_scripts/upload_file_to_s3.sh ${LAMBDA_NAME}.zip ${LAMBDA_BUCKET_NAME} &&
           #bash deploy_scripts/deploy_package_lambda.sh ${LAMBDA_NAME}
 
       #- name: Deploy to Base
