@@ -1,0 +1,88 @@
+name: Python CI
+
+on:
+  push:
+    branches:
+      - development
+      - base
+
+  pull_request:
+    branches:
+      - development
+
+jobs:
+  build:
+    if: github.ref != 'refs/heads/base' || github.ref != 'refs/heads/development'
+    runs-on: ubuntu-latest
+
+    environment:
+      name: ${{ github.ref_name }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Cache pip
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip
+
+      - name: Install dependencies
+        run: pip install tox
+
+      - name: Run tests
+        run: tox
+
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/base' || github.ref == 'refs/heads/development'
+    runs-on: ubuntu-latest
+
+    environment:
+      name: ${{ github.ref_name }}
+
+    env:
+      LAMBDA_NAME: digitized_av_notifications
+      LAMBDA_HANDLER_CODE: src/handle_digitized_av_notifications.py
+      BASENAME: handle_digitized_av_notifications.py
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Clone deploy scripts if not present
+        run: |
+          if [ ! -d deploy_scripts ]; then
+            git clone https://github.com/RockefellerArchiveCenter/deploy_scripts.git;
+          fi
+
+      - name: Export secrets to environment variables
+        uses: oNaiPs/secrets-to-env-action@v1.5
+        with:
+          secrets: ${{ toJSON(secrets) }}
+
+      - name: Make zip file
+        run: |
+          cp ${{ env.LAMBDA_HANDLER_CODE }} ${{ env.BASENAME }}
+          zip ${{ env.LAMBDA_NAME }}.zip ${{ env.BASENAME }}
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4.0.2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: us-east-1
+
+      - name: Upload file to S3
+        run: aws s3 cp $LAMBDA_NAME.zip s3://$LAMBDA_BUCKET_NAME/$LAMBDA_NAME.zip
+
+      - name: Deploy lambda package
+        run: aws lambda update-function-code
+          --function-name arn:aws:lambda:us-east-1:$AWS_LAMBDA_ACCOUNT_ID:function:$LAMBDA_NAME
+          --zip-file fileb://$LAMBDA_NAME.zip
