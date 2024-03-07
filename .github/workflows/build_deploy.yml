@@ -55,6 +55,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Clone deploy scripts if not present
+        run: |
+          if [ ! -d deploy_scripts ]; then
+            git clone https://github.com/RockefellerArchiveCenter/deploy_scripts.git;
+          fi
+
       - name: Export secrets to environment variables
         uses: oNaiPs/secrets-to-env-action@v1.5
         with:
@@ -65,12 +71,6 @@ jobs:
         with:
           files: |
             deploy_scripts/deploy_package_lambda.sh
-
-      - name: Clone deploy scripts if not present
-        run: |
-          if [ ! -d deploy_scripts ]; then
-            git clone https://github.com/RockefellerArchiveCenter/deploy_scripts.git;
-          fi
 
       - name: Make zip file
         run: |
