@@ -16,6 +16,15 @@ cd digitized_av_notifications
 
 This repository is intended to be deployed as a Lambda script in AWS infrastructure.
 
+### Expected Message Format
+
+The script is designed to consume message from an AWS Simple Notifications Service (SNS) queue. These messages are expected have the following attributes:
+- `format` - the format of the package (audio or video)
+- `refid` - the ArchivesSpace refid associated with the package
+- `service` - the service which produced the message
+- `outcome` - the outcome of the service (usually `SUCCESS` or `FAILURE`, but may also be `COMPLETE`)
+- `message` - a detailed message about the service outcome (optional).
+
 ## License
 
 This code is released under the MIT License.

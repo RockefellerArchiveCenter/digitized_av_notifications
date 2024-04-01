@@ -13,15 +13,13 @@ http = urllib3.PoolManager()
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-ssm_client = boto3.client(
-    'ssm', region_name=environ.get(
-        'AWS_DEFAULT_REGION', 'us-east-1'))
+
 full_config_path = f"/{environ.get('ENV')}/{environ.get('APP_CONFIG_PATH')}"
 
 
 def parse_attributes(attributes):
     """Parses attributes from messages."""
-    color_name = '#ff0000' if attributes['outcome']['Value'] == 'FAILURE' else '#008000'
+    color_name = 'attention' if attributes['outcome']['Value'] == 'FAILURE' else 'good'
     format = attributes['format']['Value']
     refid = attributes['refid']['Value']
     service = attributes['service']['Value']
@@ -33,15 +31,39 @@ def parse_attributes(attributes):
 def structure_teams_message(color_name, title, message, facts):
     """Structures Teams message using arguments."""
     notification = {
-        "@type": "MessageCard",
-        "@context": "http://schema.org/extensions",
-        "themeColor": color_name,
-        "summary": message if message else 'Summary',
-        "sections": [{
-            "activityTitle": title,
-            "text": message if message else 'Summary',
-            "facts": [{"name": k, "value": v} for k, v in facts.items()]
-        }]}
+        "type": "message",
+        "attachments": [
+            {
+                "contentType": "application/vnd.microsoft.card.adaptive",
+                "contentUrl": None,
+                "content": {
+                    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                    "type": "AdaptiveCard",
+                    "version": "1.5",
+                    "body": [
+                        {
+                            "type": "TextBlock",
+                            "size": "default",
+                            "weight": "bolder",
+                            "text": title,
+                            "style": "heading",
+                            "wrap": True,
+                            "color": color_name
+                        },
+                        {
+                            "type": "TextBlock",
+                            "text": message,
+                            "wrap": True
+                        },
+                        {
+                            "type": "FactSet",
+                            "facts": [{"title": k, "value": v} for k, v in facts.items()]
+                        }
+                    ]
+                }
+            }
+        ]
+    }
     return json.dumps(notification).encode('utf-8')
 
 
@@ -63,6 +85,10 @@ def get_config(ssm_parameter_path):
     """
     configuration = {}
     try:
+        ssm_client = boto3.client(
+            'ssm', region_name=environ.get(
+                'AWS_DEFAULT_REGION', 'us-east-1'))
+
         param_details = ssm_client.get_parameters_by_path(
             Path=ssm_parameter_path,
             Recursive=False,
@@ -91,10 +117,10 @@ def lambda_handler(event, context):
     attributes = event['Records'][0]['Sns']['MessageAttributes']
     color_name, format, refid, service, outcome, message = parse_attributes(
         attributes)
-    message = structure_teams_message(
+    structured_message = structure_teams_message(
         color_name,
         title,
         message,
         {'Service': service, 'Outcome': outcome, 'Format': format, 'RefID': refid})
     decrypted_url = config.get('TEAMS_URL')
-    send_teams_message(message, decrypted_url)
+    send_teams_message(structured_message, decrypted_url)
