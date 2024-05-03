@@ -11,11 +11,11 @@ on:
 
 jobs:
   deploy:
-    #if: github.ref == 'refs/heads/base' || github.ref == 'refs/heads/development'
+    if: github.ref == 'refs/heads/base' || github.ref == 'refs/heads/development'
     runs-on: ubuntu-latest
 
     environment:
-      name: development
+      name: {{ github.ref_name }}
 
     env:
       LAMBDA_NAME: digitized_av_notifications
