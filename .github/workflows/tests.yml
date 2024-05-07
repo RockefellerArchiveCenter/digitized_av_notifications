@@ -1,4 +1,4 @@
-name: build_test
+name: Tests
 
 on:
   pull_request:
@@ -7,11 +7,10 @@ on:
 
 jobs:
   build:
-    if: github.ref != 'refs/heads/base' || github.ref != 'refs/heads/development'
     runs-on: ubuntu-latest
 
     environment:
-      name: development
+      name: ${{ vars.DEV_ENVIRONMENT }}
 
     steps:
       - name: Checkout Repository
