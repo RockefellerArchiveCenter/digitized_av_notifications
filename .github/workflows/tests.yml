@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     environment:
-      name: ${{ vars.DEV_ENVIRONMENT }}
+      name: development
 
     steps:
       - name: Checkout Repository
@@ -20,12 +20,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-
-      - name: Cache pip
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip
+          cache: 'pip'
 
       - name: Install dependencies
         run: pip install tox
