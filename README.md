@@ -12,6 +12,13 @@ git clone https://github.com/RockefellerArchiveCenter/digitized_av_notifications
 cd digitized_av_notifications
 ```
 
+## Serice Flow
+
+The service processes requests as follows:
+- Parses the message body and attributes
+- Structures the message for Teams
+- Sends the message to Teams
+
 ## Usage
 
 This repository is intended to be deployed as a Lambda script in AWS infrastructure.
