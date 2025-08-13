@@ -47,6 +47,18 @@ def test_failure_notification(mock_send, mock_config, mock_structure):
         mock_send.assert_called_once()
 
 
+@patch('src.handle_digitized_av_notifications.structure_teams_message')
+@patch('src.handle_digitized_av_notifications.get_config')
+@patch('src.handle_digitized_av_notifications.send_teams_message')
+def test_missing_key(mock_send, mock_config, mock_structure):
+    with open(Path('tests', 'fixtures', 'missing_keys.json'), 'r') as jf:
+        message = json.load(jf)
+        lambda_handler(message, None)
+        mock_structure.assert_not_called()
+        mock_config.assert_called_once()
+        mock_send.assert_not_called()
+
+
 def test_structure_teams_message():
     for fixture_path, args in [
             ('failure_message_out.json', ['attention', 'video package 20f8da26e268418ead4aa2365f816a08 failed validation.', 'BagIt validation failed.', {'Service': 'validation', 'Outcome': 'failure', 'Format': 'video',
