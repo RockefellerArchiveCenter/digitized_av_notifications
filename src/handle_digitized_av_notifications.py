@@ -118,14 +118,17 @@ def lambda_handler(event, context):
 
     config = get_config(full_config_path)
 
-    title = event['Records'][0]['Sns']['Message']
-    attributes = event['Records'][0]['Sns']['MessageAttributes']
-    color_name, format, refid, service, outcome, message = parse_attributes(
-        attributes)
-    structured_message = structure_teams_message(
-        color_name,
-        title,
-        message,
-        {'Service': service, 'Outcome': outcome, 'Format': format, 'RefID': refid})
-    decrypted_url = config.get('TEAMS_URL')
-    send_teams_message(structured_message, decrypted_url)
+    try:
+        title = event['Records'][0]['Sns']['Message']
+        attributes = event['Records'][0]['Sns']['MessageAttributes']
+        color_name, format, refid, service, outcome, message = parse_attributes(
+            attributes)
+        structured_message = structure_teams_message(
+            color_name,
+            title,
+            message,
+            {'Service': service, 'Outcome': outcome, 'Format': format, 'RefID': refid})
+        decrypted_url = config.get('TEAMS_URL')
+        send_teams_message(structured_message, decrypted_url)
+    except Exception:
+        traceback.print_exc()
