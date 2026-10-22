@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.0.1](https://github.com/RockefellerArchiveCenter/digitized_av_notifications/compare/v1.0.0...v1.0.1) (2026-10-22)
+
+
+### Bug Fixes
+
+* update pip ([54f795c](https://github.com/RockefellerArchiveCenter/digitized_av_notifications/commit/54f795c22e3dcaa7d36253e273b5647d9ce331ca))
+* update pip ([54f795c](https://github.com/RockefellerArchiveCenter/digitized_av_notifications/commit/54f795c22e3dcaa7d36253e273b5647d9ce331ca))
+* update pip ([7c62d23](https://github.com/RockefellerArchiveCenter/digitized_av_notifications/commit/7c62d232c7ec6b7c87e68c1c32ed21e1d6aa61c1))
+* update pip ([7c62d23](https://github.com/RockefellerArchiveCenter/digitized_av_notifications/commit/7c62d232c7ec6b7c87e68c1c32ed21e1d6aa61c1))
+* update pip ([ca48e95](https://github.com/RockefellerArchiveCenter/digitized_av_notifications/commit/ca48e95d0abcb8674b665e593145c6eee1bc03c9))
+
 ## 1.0.0 (2026-06-18)
 
 
