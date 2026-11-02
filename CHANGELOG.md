@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.0.2](https://github.com/RockefellerArchiveCenter/digitized_av_notifications/compare/v1.0.1...v1.0.2) (2026-11-02)
+
+
+### Bug Fixes
+
+* **deps:** Scheduled dependency updates ([eb4c7d9](https://github.com/RockefellerArchiveCenter/digitized_av_notifications/commit/eb4c7d9c2bd507d96525a0bff97d5cff5bc14ea7))
+* **deps:** Scheduled dependency updates ([eb4c7d9](https://github.com/RockefellerArchiveCenter/digitized_av_notifications/commit/eb4c7d9c2bd507d96525a0bff97d5cff5bc14ea7))
+* **deps:** Scheduled dependency updates ([175c510](https://github.com/RockefellerArchiveCenter/digitized_av_notifications/commit/175c5102ac0c35f9c245631f6c815a4a340c6a89))
+* **deps:** Scheduled dependency updates ([175c510](https://github.com/RockefellerArchiveCenter/digitized_av_notifications/commit/175c5102ac0c35f9c245631f6c815a4a340c6a89))
+* **deps:** Scheduled dependency updates ([4562fb0](https://github.com/RockefellerArchiveCenter/digitized_av_notifications/commit/4562fb07cc7c484e2f8a9950a8b3f2fd65fddda4))
+
 ## [1.0.1](https://github.com/RockefellerArchiveCenter/digitized_av_notifications/compare/v1.0.0...v1.0.1) (2026-10-22)
 
 
